@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>grana</title>
+  <link type="text/css" rel="stylesheet" href="styles.css">
+
+  <script type="" src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script type="" src="model.js"></script>
+  <script type="" src="common.js"></script>
+  <script type="">
+    $(document).ready(function() {
+
+      header("Settings")
+
+      var dropdown = $("#type");
+
+      dropdown.change(function(){
+        var type = $(this).val();
+        if (type) {
+          $("#content").val(localStorage.getItem(type));
+        } else {
+          $("#content").val("");
+        }
+      });
+
+      $( "form" ).submit(function(event) {
+
+        var content = $("#content").val();
+
+        try {
+          var object = JSON.parse(content);
+          localStorage.setItem($("#type").val(), JSON.stringify(object, null, 2));
+          alert("Data updated.");
+        } catch(err) {
+          alert(err);
+        } finally {
+          event.preventDefault();
+        }
+
+      });
+
+    });
+  </script>
+</head>
+
+<body>
+
+  <div id="header">
+  </div>
+
+  <form class="" action="" method="post">
+
+    <div>
+      <select name="type" id="type">
+        <option value=""></option>
+        <option value="accounts">Accounts</option>
+      </select>
+  </div>
+
+    <div>
+      <textarea id="content" name="content" rows="15" cols="50"></textarea>
+    </div>
+    <div>
+      <button type="submit" name="submit">save</button>
+    </div>
+  </form>
+
+
+
+</body>
+
+</html>

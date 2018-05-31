@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>grana</title>
+  <link type="text/css" rel="stylesheet" href="styles.css">
+
+  <script type="" src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script type="" src="common.js"></script>
+<script type="">
+    $(document).ready(function() {
+
+      header("Dashboard")
+
+      const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+
+      var currentMonth = new Date().getMonth();
+      var month1 = monthNames[new Date().getMonth() - 1];
+      var month2 = monthNames[new Date().getMonth() - 2];
+
+      $('#table_latest3 .month-header').text(monthNames[currentMonth]);
+      $('#table_latest3 .month-1-header').text(monthNames[currentMonth - 1]);
+      $('#table_latest3 .month-2-header').text(monthNames[currentMonth - 2]);
+
+
+    });
+  </script>
+</head>
+
+<body>
+
+<div id="header">
+
+</div>
+
+  <div class="dashboard-card">
+    <table id="table_latest3" summary="Last 3 months totals table">
+      <tr>
+        <th>Accounts</th>
+        <th class="month-2-header">Month-2</th>
+        <th class="month-1-header">Month-1</th>
+        <th class="month-header">Month</th>
+      </tr>
+    </table>
+  </div>
+
+
+</body>
+
+</html>

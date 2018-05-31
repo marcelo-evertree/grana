@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <title>grana</title>
+    <meta charset="UTF-8"/>
+
+    <link type="text/css" rel="stylesheet" href="styles.css">
+
+    <script type="" src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script type="" src="model.js"></script>
+    <script type="" src="mustache.min.js"></script>
+    <script type="" src="common.js"></script>
+
+    <script type="">
+
+      var tags = Tag.findAll();
+
+      $(document).ready(function () {
+
+        header("Tags");
+
+        renderTags();
+
+        $(".add_button").click(function () {
+
+          var value = prompt("", JSON.stringify({"name": "TAG", "condition": "transaction.description.search(/REGEX/)>-1"}));
+
+          if (value) {
+            tag = JSON.parse(value)
+            tags.push(new Tag(tag.name, tag.condition));
+            Tag.save(tags)
+            renderTags();
+          }
+        });
+
+      });
+
+      function renderTags() {
+
+        $("#tags_table .data_row").remove();
+
+        for (var i = 0; i < tags.length; i++) {
+          $("#tags_table").append(Mustache.render($("#tags_table_row table").html(), {
+            name: tags[i].name,
+            condition: tags[i].condition,
+            order: i
+          }));
+        }
+
+        $(".delete_button").click(function () {
+          var order = $(this).data("order");
+          if (confirm("Should I remove tag #" + (
+            order + 1
+          ) + "?")) {
+            tags.splice(order, 1);
+            alert("Tag removed.");
+            Tag.save(tags)
+            renderTags();
+          }
+        });
+
+        $(".edit_button").click(function () {
+          var order = $(this).data("order");
+          var value = prompt("", JSON.stringify(tags[order]));
+          if (value) {
+            tag = JSON.parse(value)
+            tags[order] = new Tag(tag.name, tag.condition);
+            Tag.save(tags)
+            renderTags();
+          }
+        });
+      }
+    </script>
+  </head>
+
+  <body>
+
+    <div id="header"></div>
+
+    <button class="add_button" type="button">&#43;</button>
+
+    <table id="tags_table">
+      <tr>
+        <th>Name</th>
+        <th>Condition</th>
+        <th></th>
+        <th></th>
+      </tr>
+    </table>
+
+    <div class="template" id="tags_table_row">
+      <table>
+        <tr class="data_row">
+          <td>{{ name }}</td>
+          <td>{{ condition }}</td>
+          <td>
+            <button class="edit_button" data-order="{{ order }}">&#9998;</button>
+          </td>
+          <td>
+            <button class="delete_button" data-order="{{ order }}">&#215;</button>
+          </td>
+        </tr>
+      </table>
+    </div>
+
+  </body>
+
+</html>

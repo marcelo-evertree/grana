@@ -1,0 +1,44 @@
+body {
+  margin: 30px;
+  background-color: white;
+  color: black;
+}
+
+body, input, select, button {
+  font-family: sans-serif;
+  font-size: large;
+}
+
+textarea {
+  font-family: monospace;
+  font-size: large;
+}
+
+table, th, td {
+  border: 1px solid grey;
+  border-collapse: collapse;
+  padding: 5px;
+}
+
+.template {
+  display: none;
+}
+
+#header  {
+  height: 2em;
+}
+
+
+#header .title {
+  float: left;
+  font-size: larger;
+  color: darkgreen;
+  background-color: inherit;
+}
+
+
+#header .menu-item {
+  display: inline;
+  padding-left: 10px;
+  padding-right: 10px;
+}

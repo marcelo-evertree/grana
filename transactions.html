@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+
+<html>
+
+  <head>
+    <title>grana</title>
+    <meta charset="UTF-8"/>
+    <link type="text/css" rel="stylesheet" href="styles.css">
+
+    <script type="" src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script type="" src="model.js"></script>
+    <script type="" src="mustache.min.js"></script>
+    <script type="" src="common.js"></script>
+    <script type="">
+
+      var accounts = Account.findAll();
+
+      var currentPanel = null;
+
+      var transactions = [];
+
+      var templates = {};
+
+      const THIS_YEAR = new Date().getFullYear();
+      const THIS_MONTH = new Date().getMonth() + 1;
+
+      const IMPORT_PANEL = "#import_panel"
+      const TRANSACTIONS_PANEL = "#transactions_panel"
+
+      const MONTHS = [
+        "January",
+        "February",
+        "March",
+        "April",
+        "May",
+        "June",
+        "July",
+        "August",
+        "September",
+        "October",
+        "November",
+        "December"
+      ];
+
+      $(document).ready(function () {
+
+        header("Transactions")
+
+        buildAccountSelector();
+
+        buildYearSelector();
+
+        buildMonthSelector();
+
+        configureButtons();
+
+        configureForm();
+
+        show(TRANSACTIONS_PANEL);
+
+        templates.transactionRow = `<tr class="data-row">
+          <td>
+            <button class="delete-button" data-transaction-order="{{ order }}">&#215;</button>
+          </td>
+          <td>{{ date }}</td>
+          <td>{{ description }}</td>
+          <td>{{ value }}</td>
+          <td>
+            <button class="classify-button" data-transaction-order="{{ order }}">&#43;</button>
+            <button class="edit-button" data-transaction-order="{{ order }}">&#9998;</button>
+            {{ tags }}
+          </td>
+        </tr>`
+
+      });
+
+      function buildAccountSelector() {
+        var select = $("#account");
+        for (var i = 0; i < accounts.length; i++) {
+          select.append($("<option />").val(i).text(accounts[i].name));
+        }
+        select.change(function () {
+          loadTransactions();
+        });
+      }
+
+      function buildMonthSelector() {
+        var select = $("#month");
+        for (var month = 0; month < MONTHS.length; month++) {
+          select.append($("<option />").val(month + 1).text(MONTHS[month]).prop('selected', (month + 1) == THIS_MONTH));
+        }
+        select.change(function () {
+          loadTransactions();
+        });
+      }
+
+      function buildYearSelector() {
+        var select = $("#year");
+        for (var year = THIS_YEAR; year > THIS_YEAR - 5; year--) {
+          select.append($("<option />").val(year).text(year));
+        }
+        select.change(function () {
+          loadTransactions();
+        });
+      }
+
+      function configureButtons() {
+
+        $("#import").click(function () {
+          show(IMPORT_PANEL)
+        });
+
+        $("#classify").click(function () {
+          classifyAll();
+        });
+
+        $("#reload").click(function () {
+          loadTransactions();
+        });
+
+        $("#cancel").click(function () {
+          show(TRANSACTIONS_PANEL)
+        });
+
+      }
+
+      function configureForm() {
+        $("form").submit(function (event) {
+
+          try {
+
+            var selectedAccount = $("#account").val();
+
+            if (selectedAccount) {
+
+              var account = accounts[selectedAccount];
+
+              account.loadTransactions($("textarea").val());
+              $("textarea").val("");
+              show(TRANSACTIONS_PANEL);
+
+            } else {
+              alert("Please select an account.");
+            }
+
+          } catch (e) {
+            alert(e);
+          } finally {
+            event.preventDefault();
+          }
+
+        });
+      }
+
+      function show(panel) {
+        if (panel === IMPORT_PANEL) {
+          $("#import_panel").show();
+          $("#transactions_panel").hide();
+        } else {
+          $("#import_panel").hide();
+          $("#transactions_panel").show();
+          loadTransactions();
+        }
+        currentPanel = panel;
+      }
+
+      function loadTransactions() {
+
+        $(".data-row").remove();
+
+        var selectedAccount = $("#account").val();
+
+        if (selectedAccount) {
+          var account = accounts[selectedAccount];
+          var year = $("#year").val();
+          var month = $("#month").val();
+
+          transactions = Transaction.findAll(account, year, month);
+
+          $.each(transactions, function (index) {
+            data = {
+              order: index,
+              date: this.date,
+              description: this.description,
+              value: this.value,
+              tags: this.tags
+            };
+            row = Mustache.render(templates.transactionRow, data);
+            $("#transactions_panel table").append(row);
+          });
+
+          configureTableButtons();
+
+        } else {}
+
+      }
+
+      function configureTableButtons() {
+
+        $(".delete-button").click(function () {
+          var order = $(this).data("transaction-order");
+          if (confirm("Should I remove transaction #" + (
+            order + 1
+          ) + "?")) {
+            transactions.splice(order, 1);
+            Transaction.saveAll(transactions, true);
+            alert("Transaction removed.");
+            loadTransactions();
+          }
+        });
+
+        $(".classify-button").click(function () {
+          var order = $(this).data("transaction-order");
+
+          var value = prompt("", ":" + transactions[order].description);
+
+          if (value) {
+
+            var separator = value.indexOf(":");
+
+            tag = new Tag(value.substring(0, separator), "transaction.description.search(/" + value.substring(separator + 1) + "/)>-1");
+
+            tags = Tag.findAll();
+            tags.push(tag);
+
+            Tag.save(tags);
+
+            classifyAll();
+
+          }
+        });
+
+        $(".edit-button").click(function () {
+          var order = $(this).data("transaction-order");
+
+          var value = prompt("", JSON.stringify(transactions[order].tags));
+
+          if (value) {
+            tags = JSON.parse(value);
+            transactions[order].setCustomTags(tags);
+            Transaction.saveAll(transactions, true);
+            loadTransactions();
+          }
+
+        });
+
+      }
+
+      function classifyAll(){
+        if (transactions) {
+          for (var i = 0; i < transactions.length; i++) {
+            Tag.apply(transactions[i])
+          }
+          Transaction.saveAll(transactions, true);
+          loadTransactions();
+        }
+      }
+    </script>
+  </head>
+
+  <body>
+
+    <div id="header"></div>
+
+    <label for="account">Account</label>
+    <select class="" name="account" id="account">
+      <option value="">&nbsp;</option>
+    </select>
+
+    <hr>
+
+    <div id="import_panel">
+
+      <form action="/" method="post">
+        <textarea id="data" name="data" rows="10" cols="60"></textarea>
+        <hr>
+        <button type="reset" id="cancel">cancel</button>
+        <button type="submit" id="submit">load</button>
+      </form>
+
+    </div>
+
+    <div id="transactions_panel">
+
+      <div id="controls">
+        <label for="month">Month</label>
+        <select class="" name="month" id="month"></select>
+        <label for="year">Year</label>
+        <select class="" name="year" id="year"></select>
+        <button type="button" id="import">Import</button>
+        <button type="button" id="classify">Classify</button>
+        <button type="button" id="reload">Reload</button>
+      </div>
+
+      <hr>
+
+      <table>
+        <tr>
+          <th></th>
+          <th>Date</th>
+          <th>Description</th>
+          <th>Value</th>
+          <th>Tags</th>
+        </tr>
+      </table>
+
+    </div>
+
+  </body>
+
+</html>
