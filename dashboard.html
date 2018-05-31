@@ -3,6 +3,8 @@
 
 <head>
   <title>grana</title>
+  <meta charset="UTF-8"/>
+
   <link type="text/css" rel="stylesheet" href="styles.css">
 
   <script type="" src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
@@ -12,15 +14,9 @@
 
       header("Dashboard")
 
-      const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-
-      var currentMonth = new Date().getMonth();
-      var month1 = monthNames[new Date().getMonth() - 1];
-      var month2 = monthNames[new Date().getMonth() - 2];
-
-      $('#table_latest3 .month-header').text(monthNames[currentMonth]);
-      $('#table_latest3 .month-1-header').text(monthNames[currentMonth - 1]);
-      $('#table_latest3 .month-2-header').text(monthNames[currentMonth - 2]);
+      $('#table_latest3 .month-header').text(MONTHS[THIS_MONTH]);
+      $('#table_latest3 .month-1-header').text(MONTHS[THIS_MONTH - 1]);
+      $('#table_latest3 .month-2-header').text(MONTHS[THIS_MONTH - 2]);
 
 
     });
@@ -34,7 +30,7 @@
 </div>
 
   <div class="dashboard-card">
-    <table id="table_latest3" summary="Last 3 months totals table">
+    <table id="table_latest3">
       <tr>
         <th>Accounts</th>
         <th class="month-2-header">Month-2</th>

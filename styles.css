@@ -20,6 +20,11 @@ table, th, td {
   padding: 5px;
 }
 
+th {
+  background-color: #EEFFEE;
+  color: inherit;
+}
+
 .template {
   display: none;
 }

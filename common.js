@@ -10,7 +10,28 @@ var menu_options = [{
 }, {
   "label": "Tags",
   "url": "tags.html"
+}, {
+  "label": "Un-tagged",
+  "url": "untagged.html"
 }]
+
+const MONTHS = [
+  "January",
+  "February",
+  "March",
+  "April",
+  "May",
+  "June",
+  "July",
+  "August",
+  "September",
+  "October",
+  "November",
+  "December"
+];
+
+const THIS_YEAR = new Date().getFullYear();
+const THIS_MONTH = new Date().getMonth();
 
 
 function header(pageName) {
@@ -27,13 +48,13 @@ function header(pageName) {
 
     if (pageName === menu_options[i].label) {
       $("<span/>")
-      .text(menu_options[i].label)
-      .appendTo($item)
+        .text(menu_options[i].label)
+        .appendTo($item)
     } else {
       $("<a/>")
-      .text(menu_options[i].label)
-      .attr("href", menu_options[i].url)
-      .appendTo($item)
+        .text(menu_options[i].label)
+        .attr("href", menu_options[i].url)
+        .appendTo($item)
     }
 
   }

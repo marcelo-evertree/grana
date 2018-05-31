@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-
 <html>
 
   <head>
@@ -21,26 +20,9 @@
 
       var templates = {};
 
-      const THIS_YEAR = new Date().getFullYear();
-      const THIS_MONTH = new Date().getMonth() + 1;
-
       const IMPORT_PANEL = "#import_panel"
       const TRANSACTIONS_PANEL = "#transactions_panel"
 
-      const MONTHS = [
-        "January",
-        "February",
-        "March",
-        "April",
-        "May",
-        "June",
-        "July",
-        "August",
-        "September",
-        "October",
-        "November",
-        "December"
-      ];
 
       $(document).ready(function () {
 
@@ -87,7 +69,7 @@
       function buildMonthSelector() {
         var select = $("#month");
         for (var month = 0; month < MONTHS.length; month++) {
-          select.append($("<option />").val(month + 1).text(MONTHS[month]).prop('selected', (month + 1) == THIS_MONTH));
+          select.append($("<option />").val(month + 1).text(MONTHS[month]).prop('selected', (month) == THIS_MONTH));
         }
         select.change(function () {
           loadTransactions();
@@ -246,7 +228,7 @@
 
       }
 
-      function classifyAll(){
+      function classifyAll() {
         if (transactions) {
           for (var i = 0; i < transactions.length; i++) {
             Tag.apply(transactions[i])
@@ -283,13 +265,17 @@
     <div id="transactions_panel">
 
       <div id="controls">
+
         <label for="month">Month</label>
         <select class="" name="month" id="month"></select>
+
         <label for="year">Year</label>
         <select class="" name="year" id="year"></select>
+
         <button type="button" id="import">Import</button>
         <button type="button" id="classify">Classify</button>
         <button type="button" id="reload">Reload</button>
+        
       </div>
 
       <hr>
